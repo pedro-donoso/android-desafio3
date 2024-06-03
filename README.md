@@ -77,3 +77,138 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+
+2. La pantalla principal está definida en un fragmento donde el usuario ingresa la contraseña. El diseño de la pantalla es libre, pero debe incluir un campo de texto para ingresar la contraseña, un botón deshabilitado que se habilita cuando se cumplen los criterios y un texto indicando las características que debe tener la contraseña.
+
+   #### fragment_main.xml:
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvPasswordCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una letra minúscula y un número."
+        android:paddingBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ingrese su contraseña"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enviar"
+        android:enabled="false"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
+   ```
+
+#### MainFragment.kt:
+
+```
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+android.widget.Button
+android.widget.EditText
+import androidx.fragment.app.Fragment
+import com.example.app.R
+
+class MainFragment : Fragment() {
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.fragment_main, container, false)
+
+        val etPassword = view.findViewById<EditText>(R.id.etPassword)
+        val btnSubmit = view.findViewById<Button>(R.id.btnSubmit)
+
+        etPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val password = s.toString()
+                btnSubmit.isEnabled = isPasswordValid(password)
+            }
+        })
+
+        btnSubmit.setOnClickListener {
+            // Manejar el evento de clic del botón
+        }
+
+        return view
+    }
+
+    private fun isPasswordValid(password: String): Boolean {
+        val passwordPattern = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")
+        return password.matches(passwordPattern)
+    }
+}
+```
+
+#### nav_graph.xml:
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.app.MainFragment"
+        android:label="Main Fragment"
+        tools:layout="@layout/fragment_main" />
+</navigation>
+```
+
+#### MainActivity.kt:
+```
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.NavigationUI
+import com.example.app.R
+
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        NavigationUI.setupActionBarWithNavController(this, navController)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+}
+```
