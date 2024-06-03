@@ -535,3 +535,180 @@ class ResultFragment : Fragment() {
 </LinearLayout>
 ```
 
+5. Validación de la contraseña aplicando los 2 criterios: 
+      a. Tiene más de 5 caracteres. 
+      b. Tiene al menos una letra mayúscula.
+
+#### MainFragment.kt:
+```
+private fun isPasswordValid(password: String): Boolean {
+    val lengthCriteria = password.length > 5
+    val uppercaseCriteria = password.any { it.isUpperCase() }
+    return lengthCriteria && uppercaseCriteria
+}
+```
+
+#### fragment_mail.xml:
+```
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvPasswordCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="La contraseña debe tener más de 5 caracteres y al menos una letra mayúscula."
+        android:paddingBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ingrese su contraseña"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enviar"
+        android:enabled="false"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
+```
+
+#### MainFragment.xml:
+
+```
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.app.databinding.FragmentMainBinding
+
+class MainFragment : Fragment() {
+
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        binding.etPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val password = s.toString()
+                binding.btnSubmit.isEnabled = isPasswordValid(password)
+            }
+        })
+
+        binding.btnSubmit.setOnClickListener {
+            findNavController().navigate(R.id.action_mainFragment_to_resultFragment)
+        }
+
+        return view
+    }
+
+    private fun isPasswordValid(password: String): Boolean {
+        val lengthCriteria = password.length > 5
+        val uppercaseCriteria = password.any { it.isUpperCase() }
+        return lengthCriteria && uppercaseCriteria
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}
+```
+
+#### fragment_result.xml:
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvPasswordCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Criterios para validar la contraseña:"
+        android:textStyle="bold"
+        android:paddingBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        android:text="• Más de 5 caracteres\n• Al menos una letra mayúscula" />
+
+    <TextView
+        android:id="@+id/tvSecurityTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Consejos para mejorar la seguridad:"
+        android:textStyle="bold"
+        android:paddingBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="• Usa una combinación de caracteres especiales\n• No uses palabras comunes o información personal\n• Cambia tu contraseña regularmente\n• Usa un gestor de contraseñas" />
+</LinearLayout>
+```
+
+#### FragmentResult.xml:
+
+```
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.example.app.databinding.FragmentResultBinding
+
+class ResultFragment : Fragment() {
+
+    private var _binding: FragmentResultBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentResultBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}
+```
+
