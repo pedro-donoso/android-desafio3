@@ -1199,3 +1199,80 @@ class MainFragment : Fragment() {
     }
 }
 ```
+
+10.  Extraer los textos al archivo de recursos de textos (strings.xml):
+
+#### strings.xml:
+```
+<resources>
+    <string name="app_name">YourAppName</string>
+    <string name="password_criteria">La contraseña debe tener más de 5 caracteres y al menos una letra mayúscula.</string>
+    <string name="password_hint">Ingrese su contraseña</string>
+    <string name="submit_button_text">Enviar</string>
+    <string name="main_fragment_label">MainFragment</string>
+    <string name="result_fragment_label">ResultFragment</string>
+</resources>
+```
+
+#### fragment_main.xml:
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvPasswordCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/password_criteria"
+        android:paddingBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/password_hint"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/submit_button_text"
+        android:enabled="false"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
+```
+
+#### nav_graph.xml:
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.app.MainFragment"
+        android:label="@string/main_fragment_label"
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_resultFragment"
+            app:destination="@id/resultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.example.app.ResultFragment"
+        android:label="@string/result_fragment_label"
+        tools:layout="@layout/fragment_result" />
+</navigation>
+```
