@@ -806,3 +806,69 @@ class MainFragment : Fragment() {
         android:layout_marginTop="16dp" />
 </LinearLayout>
 ```
+
+7. Utilizar onClickListener para reaccionar al click en el botón.
+
+#### MainFragment.kt
+```
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.app.databinding.FragmentMainBinding
+
+class MainFragment : Fragment() {
+
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        // Set up TextWatcher to listen for password changes
+        binding.etPassword.addTextChangedListener(passwordTextWatcher)
+
+        // Set up OnClickListener for the button
+        binding.btnSubmit.setOnClickListener {
+            onSubmitButtonClick()
+        }
+
+        return view
+    }
+
+    private val passwordTextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+        override fun afterTextChanged(s: Editable?) {
+            val password = s.toString()
+            binding.btnSubmit.isEnabled = isPasswordValid(password)
+        }
+    }
+
+    private fun isPasswordValid(password: String): Boolean {
+        val lengthCriteria = password.length > 5
+        val uppercaseCriteria = password.any { it.isUpperCase() }
+        return lengthCriteria && uppercaseCriteria
+    }
+
+    private fun onSubmitButtonClick() {
+        // Navigate to the result fragment
+        findNavController().navigate(R.id.action_mainFragment_to_resultFragment)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}
+```
