@@ -212,3 +212,147 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+3. La pantalla de resultado está definida en un fragmento donde se le muestra al usuario los criterios usados para validar su contraseña, y algunos consejos para mejorar su seguridad.
+
+   #### fragment_result.xml:
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvPasswordCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Criterios para validar la contraseña:"
+        android:textStyle="bold"
+        android:paddingBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvCriteria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        android:text="• Al menos 8 caracteres\n• Una letra mayúscula\n• Una letra minúscula\n• Un número" />
+
+    <TextView
+        android:id="@+id/tvSecurityTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Consejos para mejorar la seguridad:"
+        android:textStyle="bold"
+        android:paddingBottom="8dp" />
+
+    <TextView
+        android:id="@+id/tvTips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="• Usa una combinación de caracteres especiales\n• No uses palabras comunes o información personal\n• Cambia tu contraseña regularmente\n• Usa un gestor de contraseñas" />
+</LinearLayout>
+   ```
+
+#### ResultFragment.kt:
+```
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.example.app.R
+
+class ResultFragment : Fragment() {
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_result, container, false)
+    }
+}
+```
+
+#### nav_graph.xml:
+```
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.app.MainFragment"
+        android:label="Main Fragment"
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_mainFragment_to_resultFragment"
+            app:destination="@id/resultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.example.app.ResultFragment"
+        android:label="Result Fragment"
+        tools:layout="@layout/fragment_result" />
+</navigation>
+```
+
+#### MainFragment.kt:
+
+```
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+android.widget.Button
+android.widget.EditText
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.app.R
+
+class MainFragment : Fragment() {
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.fragment_main, container, false)
+
+        val etPassword = view.findViewById<EditText>(R.id.etPassword)
+        val btnSubmit = view.findViewById<Button>(R.id.btnSubmit)
+
+        etPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val password = s.toString()
+                btnSubmit.isEnabled = isPasswordValid(password)
+            }
+        })
+
+        btnSubmit.setOnClickListener {
+            // Navegar al fragmento de resultados
+            findNavController().navigate(R.id.action_mainFragment_to_resultFragment)
+        }
+
+        return view
+    }
+
+    private fun isPasswordValid(password: String): Boolean {
+        val passwordPattern = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$")
+        return password.matches(passwordPattern)
+    }
+}
+```
+
